@@ -15,7 +15,7 @@ class ThisType(Protocol):
 class ILSParams:
     iterations: int
     local_steps: int              #for ze hill climb steps per iteration
-    pert_swaps: int               #how many random swaps
+    swaps: int                    #how many random swaps
     seed: int
     accept_worse_prob: float      #probability to accept worse solutions
     verbose_every: int            #how often to print results 0 never
@@ -116,5 +116,19 @@ def escape_local(seq, rng, swaps:int):
         i,j = random_swap(s,rng)
         apply_swap(s,i,j)
     return s
+
+def iterated_local_search(instance: ThisType, params: ILSParams, initial):
+    rng         = random.Random(params.seed)
+
+    #initiate seaquence and search
+    s0          = initial[:] if initial is not None else initial_state(instance,rng,method=params.init)
+    s           = local_search(instance, s0, rng, steps=params.local_steps)
+
+    best        = s[:]
+    best_cost   = get_makespan(instance,best)
+    history     = [best_cost]
+
+    for 
+
 
 

@@ -24,18 +24,17 @@ class ILSParams:
 @dataclass
 class ILSResults:
     best_sequence: List[int]      #list of the best jobs order
-    best_time: int                #best finish time, total schedule length
+    best_makespan: int                #best finish time, total schedule length
     best_historically: List[int]  #best so far
 
 
 #get total time from jobs in a set 
 def get_makespan(instance: ThisType, seq: seq[int]):
 
-    nJ            = instance.n_jobs
-    next_op       = [0]*instance_jobs
-    job_ready     = [0]*instance_jobs
+    next_op       = [0]*instance.n_jobs
+    job_ready     = [0]*instance.n_jobs
     machine_ready = [0]*instance.n_machines
-
+    
     for s in seq:
         n         = next_op[s]
         m, p      = instance.jobs[s][n]
@@ -49,6 +48,28 @@ def get_makespan(instance: ThisType, seq: seq[int]):
 
     print(f"job ready; {job_ready}, max job ready; {max(job_ready)}")
     return max(job_ready) if job_ready else 0
+
+
+def get_bestjob(instance: ThisType, seq: seq[int]):
+
+    next_op       = [0]*instance.n_jobs
+    job_ready     = [0]*instance.n_jobs
+    machine_ready = [0]*instance.n_machines
+    ops_log       = []
+    
+    for s in seq:
+        n         = next_op[s]
+        m, p      = instance.jobs[s][n]
+
+        start     = machine_ready[m] if machine_ready[m] > job_ready[s] else job_ready[s]
+        finish    = start + p
+
+        machine_ready[m] = finish
+        job_ready[s]     = finish
+        next_op[s]       = n + 1
+
+    return job_ready, ops_log
+
 
 #how many operations job do
 def job_op_counts(instance: ThisType):
@@ -117,7 +138,7 @@ def escape_local(seq, rng, swaps:int):
         apply_swap(s,i,j)
     return s
 
-def iterated_local_search(instance: ThisType, params: ILSParams, initial):
+def iterated_local_search(instance: ThisType, params: ILSParams, initial=None):
     rng         = random.Random(params.seed)
 
     #initiate seaquence and search
@@ -128,7 +149,33 @@ def iterated_local_search(instance: ThisType, params: ILSParams, initial):
     best_cost   = get_makespan(instance,best)
     history     = [best_cost]
 
-    for 
+    for i in range(1, params.iterations + 1):
+        S_ESC   = escape_local(s,rng,params.swaps)
+        S_NEW   = local_search(instance,S_ESC,rng, steps=params.local_steps)
 
+        cost_s  = get_makespan(instance,s)
+        cost_new= get_makespan(instance,S_NEW)
+
+        #we acccept
+        if cost_new < cost_s:
+            s = S_NEW
+        else:
+            if params.accept_worse_prob > 0 and rng.random() < params.accept_worse_prob:
+                s = S_NEW
+        
+        cost_s = get_makespan(instance,s)
+        if cost_s < best_cost:
+            best = s[:]
+            best_cost = cost_s
+        
+        history.append(best_cost)
+
+        if i % 10 == 0:
+            print("current:", cost_s, "best:", best_cost)
+
+        if params.verbose_every and (i % params.verbose_every == 0):
+            print(f"[ILS] iter={it} current={cost_s} best={best_cost}")
+        
+    return ILSResults(best_sequence=best, best_makespan=best_cost, best_historically=history)
 
 

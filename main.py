@@ -1,6 +1,8 @@
 from parser.abz_parser import parse_all_abz, print_all
 from trajectory.ils import ILSParams, iterated_local_search, get_makespan
 from population.gs import Population
+from plotter.plot import plot_all_instances
+from compare import compare_on_instance
 import random
 
 def run_specific_ils():
@@ -45,4 +47,5 @@ def main():
     
 
 if __name__ == "__main__":
-    run_specific_ils()
+    main()
+

@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from parser.abz_parser import parse_all_abz
 from trajectory.ils import ILSParams, iterated_local_search
 from population.gs import Population
+from plotter.plot import plot_convergence_mean
+
 
 
 # -----------------------
@@ -17,7 +19,7 @@ from population.gs import Population
 
 DEFAULT_ILS_CFG = dict(
     iterations=87,
-    local_steps=800, #low for fast
+    local_steps=50, #low for fast
     swaps=2,
     accept_worse_prob=0.16,
     init="order",
@@ -25,11 +27,11 @@ DEFAULT_ILS_CFG = dict(
 )
 
 DEFAULT_GA_CFG = dict(
-    population_size=175,
+    population_size=10,  #175
     mutation_rate=0.005,
     crossover_rate=0.055,
-    new_genomes_per_gen=150,
-    max_iterations_without_improvement=50,
+    new_genomes_per_gen=20, #150?
+    max_iterations_without_improvement=50, #50
     verbose_every=0,
 )
 
@@ -65,7 +67,7 @@ def pick_instance(instances, *, idx: Optional[int] = None, name: Optional[str] =
 # Solver runners
 # -----------------------
 
-def run_ils(inst, cfg: Dict[str, Any], seed: int):
+def run_ils(inst, cfg, seed: int):
     params = ILSParams(
         iterations=cfg["iterations"],
         local_steps=cfg["local_steps"],
@@ -76,12 +78,12 @@ def run_ils(inst, cfg: Dict[str, Any], seed: int):
         init=cfg["init"],
     )
     res = iterated_local_search(inst, params)
-    return res.best_makespan, params
+    # drop history[0] if it’s “iteration 0”
+    return res.best_makespan, res.best_historically[1:]
 
 
-def run_ga(inst, cfg: Dict[str, Any], seed: int):
+def run_ga(inst, cfg, seed: int):
     random.seed(seed)
-
     pop = Population(
         problem_instance=inst,
         population_size=cfg["population_size"],
@@ -90,15 +92,8 @@ def run_ga(inst, cfg: Dict[str, Any], seed: int):
         max_iterations_without_improvement=cfg["max_iterations_without_improvement"],
         new_genomes_per_gen=cfg["new_genomes_per_gen"],
     )
-
-    # If your Population.simulation supports verbose_every, pass it.
-    # Otherwise, remove verbose_every.
-    try:
-        best = pop.simulation(verbose_every=cfg.get("verbose_every", 0))
-    except TypeError:
-        best = pop.simulation()
-
-    return best, cfg
+    best = pop.simulation(verbose_every=cfg.get("verbose_every", 0))
+    return best, pop.history_best
 
 
 def compare_on_instance(
@@ -111,6 +106,8 @@ def compare_on_instance(
 ):
     # generate deterministic seeds for fairness
     seeds = [base_seed + i for i in range(repeats)]
+    ils_histories = []
+    ga_histories = []
 
     # ---- ILS ----
     ils_scores: List[int] = []
@@ -119,6 +116,7 @@ def compare_on_instance(
     for sd in seeds:
         score, params = run_ils(inst, ils_cfg, sd)
         ils_scores.append(score)
+        ils_histories.append(params)
         if score < ils_best[0]:
             ils_best = (score, sd, params)
     t1 = time.perf_counter()
@@ -129,8 +127,9 @@ def compare_on_instance(
     ga_best = (float("inf"), None, None)  # (score, seed, cfg)
     t2 = time.perf_counter()
     for sd in seeds:
-        score, _ = run_ga(inst, ga_cfg, sd)
+        score, hist = run_ga(inst, ga_cfg, sd)
         ga_scores.append(score)
+        ga_histories.append(hist)
         if score < ga_best[0]:
             ga_best = (score, sd, ga_cfg.copy())
     t3 = time.perf_counter()
@@ -140,10 +139,65 @@ def compare_on_instance(
         "instance": (inst.name, inst.n_jobs, inst.n_machines),
         "repeats": repeats,
         "seeds": seeds,
-        "ils": {"cfg": ils_cfg, "scores": ils_scores, "stats": ils_stats, "best": ils_best},
-        "ga": {"cfg": ga_cfg, "scores": ga_scores, "stats": ga_stats, "best": ga_best},
+        "ils": {"cfg": ils_cfg, "scores": ils_scores, "histories": ils_histories, "stats": ils_stats, "best": ils_best},
+        "ga":  {"cfg": ga_cfg,  "scores": ga_scores,  "histories": ga_histories,  "stats": ga_stats,  "best": ga_best},
     }
 
+
+def compare_on_instances(
+    instances,
+    *,
+    instance_indices: Optional[List[int]] = None,
+    ils_cfg: Dict[str, Any],
+    ga_cfg: Dict[str, Any],
+    repeats: int = 10,
+    base_seed: int = 42,
+    per_instance_print: bool = True,
+):
+    if instance_indices is None:
+        instance_indices = list(range(len(instances)))
+
+    reports = []
+    t0 = time.perf_counter()
+
+    for k, idx in enumerate(instance_indices, start=1):
+        inst = instances[idx]
+        rep = compare_on_instance(
+            inst,
+            ils_cfg=ils_cfg,
+            ga_cfg=ga_cfg,
+            repeats=repeats,
+            base_seed=base_seed,
+        )
+        reports.append(rep)
+
+        if per_instance_print:
+            print(f"[{k}/{len(instance_indices)}] {inst.name} done")
+
+    t1 = time.perf_counter()
+
+    # Each instance counts equally: aggregate using per-instance means
+    ils_means = [r["ils"]["stats"]["mean"] for r in reports]
+    ga_means  = [r["ga"]["stats"]["mean"] for r in reports]
+
+    agg = {
+        "n_instances": len(reports),
+        "repeats": repeats,
+        "total_runtime_sec": t1 - t0,
+        "ils": {
+            "mean_of_instance_means": statistics.mean(ils_means),
+            "median_of_instance_means": statistics.median(ils_means),
+        },
+        "ga": {
+            "mean_of_instance_means": statistics.mean(ga_means),
+            "median_of_instance_means": statistics.median(ga_means),
+        },
+    }
+    
+    
+
+
+    return reports, agg
 
 def print_report(report: Dict[str, Any]):
     name, nj, nm = report["instance"]
@@ -175,13 +229,11 @@ def print_report(report: Dict[str, Any]):
 # Main
 # -----------------------
 
-def main():
+def main1():
     jobshop = open("jobshop.txt", "r", encoding="utf-8").read()
     instances = parse_all_abz(jobshop)
 
-    # Choose ONE:
     inst = pick_instance(instances, idx=79)
-    # inst = pick_instance(instances, name="instance la22")
 
     report = compare_on_instance(
         inst,
@@ -193,6 +245,25 @@ def main():
 
     print_report(report)
 
+def main2():
+    jobshop = open("jobshop.txt", "r", encoding="utf-8").read()
+    instances = parse_all_abz(jobshop)
+
+    instance_indices = [31]  # run only instance #31
+
+    reports, agg = compare_on_instances(
+        instances,
+        instance_indices=[31],
+        ils_cfg=DEFAULT_ILS_CFG,
+        ga_cfg=DEFAULT_GA_CFG,
+        repeats=10,
+        base_seed=42,
+        per_instance_print=False,
+    )
+
+    plot_convergence_mean(reports[0], out_dir="logs", tag="inst31")
+
+
 
 if __name__ == "__main__":
-    main()
+    main2()

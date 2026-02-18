@@ -31,10 +31,11 @@ def job_based_crossover(parent1: List[int], parent2: List[int], n_jobs: int):
 
 def generate_random_genome(n_machines: int, n_jobs: int):
     res = []
-    for _ in range(n_jobs):
-        res.extend(random.sample(range(n_jobs), n_jobs))
-    for i in range(n_jobs):
-        assert res.count(i) == n_jobs, f"Expected {n_jobs} occurances of i, got {res.count(i)}"
+    for j in range(n_jobs):
+        res.extend([j] * n_machines)
+    random.shuffle(res)
+    for j in range(n_jobs):
+        assert res.count(j) == n_machines, f"job {j} count {res.count(j)} != {n_machines}"
     return tuple(res)
 
 
@@ -82,9 +83,10 @@ class Population():
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
         self.population = generate_random_population(
-            population_size, problem_instance.n_jobs, problem_instance.n_machines)
+            population_size, problem_instance.n_machines, problem_instance.n_jobs)
         self.max_iterations_without_improvement = max_iterations_without_improvement
         self.new_genomes_per_gen = new_genomes_per_gen
+        self.history_best = []
 
     def simulate_generation(self):
         #random.seed()
@@ -108,31 +110,32 @@ class Population():
             self.problem_instance, x))
         self.population = self.population[:self.population_size]
 
-    def simulation(self, verbose_every: int = 10):
-        current_gen = 0
+    def simulation(self, verbose_every: int = 0):
         gens_without_improvement = 0
         best_score = float("inf")
+        gen = 0
 
-        #print("Starting run with instance", self.problem_instance.name)
+        self.history_best = []  # reset every run
 
         while gens_without_improvement < self.max_iterations_without_improvement:
             self.simulate_generation()
-            current_gen += 1
+            gen += 1
 
-            current_best_score = get_makespan(self.problem_instance, self.population[0])
+            current_best = get_makespan(self.problem_instance, self.population[0])
 
-            # update best + no-improve counter
-            if current_best_score < best_score:
-                best_score = current_best_score
+            if current_best < best_score:
+                best_score = current_best
                 gens_without_improvement = 0
             else:
                 gens_without_improvement += 1
 
-            
-            if verbose_every and (current_gen % verbose_every == 0):
+            # best-so-far curve
+            self.history_best.append(best_score)
+
+            if verbose_every and (gen % verbose_every == 0):
                 print(
-                    f"gen={current_gen} "
-                    f"current={current_best_score} best={best_score} "
+                    f"[GA] gen={gen} current={current_best} best={best_score} "
+                    f"no_improve={gens_without_improvement}"
                 )
 
         return best_score

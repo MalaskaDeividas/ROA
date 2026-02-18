@@ -1,7 +1,4 @@
 from typing import List, Tuple
-from trajectory.ils import ThisType, get_makespan
-
-import random
 #######
 # Genetic Strategy
 # Encoding: There are n machines and m jobs, where each job has n steps.

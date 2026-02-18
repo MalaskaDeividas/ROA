@@ -16,13 +16,10 @@ class ILSParams:
     iterations: int
     local_steps: int              #for ze hill climb steps per iteration
     swaps: int                    #how many random swaps
-    local_steps: int  # for ze hill climb steps per iteration
-    pert_swaps: int  # how many random swaps
     seed: int
-    accept_worse_prob: float  # probability to accept worse solutions
-    verbose_every: int  # how often to print results 0 never
-    # how to startinitial solution, order = job0,job1 and so on, while random is random lol
-    init: str = "order"
+    accept_worse_prob: float      # probability to accept worse solutions
+    verbose_every: int            # how often to print results 0 never
+    init: str = "order"           # how to startinitial solution, order = job0,job1 and so on, while random is random lol
 
 
 @dataclass
@@ -30,10 +27,7 @@ class ILSResults:
     best_sequence: List[int]      #list of the best jobs order
     best_makespan: int                #best finish time, total schedule length
     best_historically: List[int]  #best so far
-    best_sequence: List[int]  # list of the best jobs order
-    best_time: int  # best finish time, total schedule length
-    best_historically: List[int]  # best so far
-
+    
 
 # get total time from jobs in a set
 def get_makespan(instance: ThisType, seq: list[int]):

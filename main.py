@@ -40,9 +40,6 @@ def run_gs():
 
 
 
-#hello I merge to main
-
-
 def main():
     return
     

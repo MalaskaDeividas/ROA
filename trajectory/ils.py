@@ -30,15 +30,19 @@ class ILSResults:
     best_sequence: List[int]      #list of the best jobs order
     best_makespan: int                #best finish time, total schedule length
     best_historically: List[int]  #best so far
+    best_sequence: List[int]  # list of the best jobs order
+    best_time: int  # best finish time, total schedule length
+    best_historically: List[int]  # best so far
 
 
 # get total time from jobs in a set
 def get_makespan(instance: ThisType, seq: list[int]):
 
-    next_op       = [0]*instance.n_jobs
+    nJ            = instance.n_jobs
+    next_op       = [0]* instance.n_jobs
     job_ready     = [0]*instance.n_jobs
     machine_ready = [0]*instance.n_machines
-    
+
     for s in seq:
         n = next_op[s]
         m, p = instance.jobs[s][n]
@@ -50,32 +54,12 @@ def get_makespan(instance: ThisType, seq: list[int]):
         job_ready[s] = finish
         next_op[s] = n + 1
 
-    print(f"job ready; {job_ready}, max job ready; {max(job_ready)}")
-    return max(job_ready) if job_ready else 0
-
-
-def get_bestjob(instance: ThisType, seq: seq[int]):
-
-    next_op       = [0]*instance.n_jobs
-    job_ready     = [0]*instance.n_jobs
-    machine_ready = [0]*instance.n_machines
-    ops_log       = []
-    
-    for s in seq:
-        n         = next_op[s]
-        m, p      = instance.jobs[s][n]
-
-        start     = machine_ready[m] if machine_ready[m] > job_ready[s] else job_ready[s]
-        finish    = start + p
-
-        machine_ready[m] = finish
-        job_ready[s]     = finish
-        next_op[s]       = n + 1
-
     return job_ready, ops_log
 
 
-#how many operations job do
+# how many operations job do
+
+
 def job_op_counts(instance: ThisType):
     return [len(instance.jobs[n]) for n in range(instance.n_jobs)]
 

@@ -12,7 +12,7 @@ def run_specific_ils():
     inst = instances[5]
     rand = 42 + random.randint(0, 1_000_000_000)
 
-    params = ILSParams(iterations=10, local_steps=10, swaps=7, seed=rand, accept_worse_prob=0.1, verbose_every=200, init="order", pert_swaps=10)
+    params = ILSParams(iterations=10, local_steps=10, swaps=7, seed=rand, accept_worse_prob=0.1, verbose_every=200, init="order")
     res = iterated_local_search(inst, params)
     job_ready = get_makespan(inst, res.best_sequence)
     print("instance:", inst.name, inst.n_jobs, inst.n_machines)
@@ -38,9 +38,6 @@ def run_gs():
     print("Solution found:", solution)
 
 
-
-
-#hello I merge to main
 
 
 def main():

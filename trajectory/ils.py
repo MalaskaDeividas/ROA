@@ -57,14 +57,10 @@ def get_makespan(instance: ThisType, seq: list[int]):
     return max(machine_ready)
 
 # how many operations job do
-
-
 def job_op_counts(instance: ThisType):
     return [len(instance.jobs[n]) for n in range(instance.n_jobs)]
 
 # two initial states, we either take the jobshop list as is in order aka "order" or random aka "random"
-
-
 def initial_state(instance: ThisType, rng: random.Random, method="order"):
     counts = job_op_counts(instance)
     total_ops = sum(counts)
@@ -93,13 +89,9 @@ def initial_state(instance: ThisType, rng: random.Random, method="order"):
     return seq
 
 # swao two neighbors
-
-
 def random_swap(seq, rng):
     i, j = rng.sample(range(len(seq)), 2)
     return i, j
-
-# fam
 
 
 def apply_swap(seq, i, j):

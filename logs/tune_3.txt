@@ -1,0 +1,8 @@
+Log file: /home/deividas/Code/ROA/logs/tune_3.txt
+
+BEST CONFIG FOUND
+cfg: {'population_size': 175, 'mutation_rate': 0.005, 'crossover_rate': 0.055, 'new_genomes_per_gen': 150, 'max_no_improve': 50}
+stats: {'mean': 624.3333333333334, 'median': 433, 'min': 55, 'max': 1267, 'runtime_sec': 14.944634929997846, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+population = Population(problem_instance=inst, population_size=175, mutation_rate=0.005, crossover_rate=0.055, max_iterations_without_improvement=50, new_genomes_per_gen=150)

@@ -9,7 +9,7 @@ def run_specific_ils():
         jobshop = f.read()
 
     instances = parse_all_abz(jobshop)
-    inst = instances[5]
+    inst = instances[79]
     rand = 42 + random.randint(0, 1_000_000_000)
 
     params = ILSParams(iterations=10, local_steps=10, swaps=7, seed=rand, accept_worse_prob=0.1, verbose_every=200, init="order")

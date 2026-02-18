@@ -1,0 +1,15 @@
+Log file: /home/deividas/Code/ROA/logs/tune_0.txt
+
+BEST CONFIG FOUND
+cfg: {'iterations': 90, 'local_steps': 500, 'swaps': 2, 'accept_worse_prob': 0.2, 'init': 'order'}
+stats: {'mean': 805.2, 'median': 958, 'min': 55, 'max': 1266, 'runtime_sec': 11.400037275991053, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+params = ILSParams(iterations=90, local_steps=500, swaps=2, seed=123, accept_worse_prob=0.2, verbose_every=0, init='order')
+
+BEST CONFIG FOUND
+cfg: {'population_size': 200, 'mutation_rate': 0.01, 'crossover_rate': 0.5, 'new_genomes_per_gen': 100, 'max_no_improve': 50}
+stats: {'mean': 626.3333333333334, 'median': 433, 'min': 55, 'max': 1281, 'runtime_sec': 15.345663878004416, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+population = Population(problem_instance=inst, population_size=200, mutation_rate=0.01, crossover_rate=0.5, max_iterations_without_improvement=50, new_genomes_per_gen=100)

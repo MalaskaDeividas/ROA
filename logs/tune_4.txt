@@ -1,0 +1,8 @@
+Log file: /home/deividas/Code/ROA/logs/tune_4.txt
+
+BEST CONFIG FOUND
+cfg: {'iterations': 87, 'local_steps': 200, 'swaps': 2, 'accept_worse_prob': 0.15, 'init': 'order'}
+stats: {'mean': 819.6, 'median': 988, 'min': 55, 'max': 1300, 'runtime_sec': 3.9611382040020544, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+params = ILSParams(iterations=87, local_steps=200, swaps=2, seed=123, accept_worse_prob=0.15, verbose_every=0, init='order')

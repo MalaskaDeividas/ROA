@@ -1,5 +1,6 @@
 from typing import List, Tuple
 from trajectory.ils import ThisType, get_makespan
+import time
 
 import random
 #######
@@ -86,7 +87,7 @@ class Population():
         self.new_genomes_per_gen = new_genomes_per_gen
 
     def simulate_generation(self):
-        random.seed()
+        #random.seed()
         self.population.sort(key=lambda x: get_makespan(
             self.problem_instance, x))
         current_idx = 0
@@ -100,26 +101,38 @@ class Population():
                 new_genome = mutate(self.population[current_idx])
                 new_genomes.append(new_genome)
 
+            current_idx += 1
+
         self.population.extend(new_genomes)
         self.population.sort(key=lambda x: get_makespan(
             self.problem_instance, x))
         self.population = self.population[:self.population_size]
 
-    def simulation(self):
+    def simulation(self, verbose_every: int = 10):
         current_gen = 0
         gens_without_improvement = 0
         best_score = float("inf")
-        print("Starting run with instance", self.problem_instance.name)
-        while True:
+
+        #print("Starting run with instance", self.problem_instance.name)
+
+        while gens_without_improvement < self.max_iterations_without_improvement:
             self.simulate_generation()
+            current_gen += 1
+
             current_best_score = get_makespan(self.problem_instance, self.population[0])
-            print(f"Best score by gen: {current_best_score}")
-            print(f"Best score total: {best_score}")
-            if current_best_score >= best_score:
-                gens_without_improvement += 1
-            else:
+
+            # update best + no-improve counter
+            if current_best_score < best_score:
                 best_score = current_best_score
                 gens_without_improvement = 0
-            if gens_without_improvement == self.max_iterations_without_improvement:
-                break
+            else:
+                gens_without_improvement += 1
+
+            
+            if verbose_every and (current_gen % verbose_every == 0):
+                print(
+                    f"gen={current_gen} "
+                    f"current={current_best_score} best={best_score} "
+                )
+
         return best_score

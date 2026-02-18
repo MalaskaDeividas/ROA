@@ -38,7 +38,6 @@ class ILSResults:
 # get total time from jobs in a set
 def get_makespan(instance: ThisType, seq: list[int]):
 
-    nJ            = instance.n_jobs
     next_op       = [0]* instance.n_jobs
     job_ready     = [0]*instance.n_jobs
     machine_ready = [0]*instance.n_machines
@@ -53,7 +52,8 @@ def get_makespan(instance: ThisType, seq: list[int]):
         machine_ready[m] = finish
         job_ready[s] = finish
         next_op[s] = n + 1
-
+    
+    #print(f"job ready; {job_ready}, max job ready; {max(job_ready)}")
     return max(machine_ready)
 
 # how many operations job do

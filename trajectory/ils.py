@@ -155,6 +155,6 @@ def iterated_local_search(instance: ThisType, params: ILSParams, initial=None):
         if params.verbose_every and (i % params.verbose_every == 0):
             print(f"[ILS] iter={it} current={cost_s} best={best_cost}")
         
-    return ILSResults(best_sequence=best, best_makespan=best_cost, best_historically=history, best_time=best_cost)
+    return ILSResults(best_sequence=best, best_makespan=best_cost, best_historically=history)
 
 

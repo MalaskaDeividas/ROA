@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import List, Tuple
 from .schedule_instance import Schedule_Instance
+import re
 
 def parse_all_abz(text) -> List[Schedule_Instance]:
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
@@ -10,6 +11,9 @@ def parse_all_abz(text) -> List[Schedule_Instance]:
 
     i = 0
     while i < len(lines):
+        name_match = re.match("instance +\\w", lines[i])
+        if name_match: 
+            name = lines[i].strip()
         pairs = lines[i].split()
         if len(pairs) == 2 and all(p.lstrip("-").isdigit() for p in pairs):
 
@@ -37,7 +41,7 @@ def parse_all_abz(text) -> List[Schedule_Instance]:
             if good:
                 instances.append(
                     Schedule_Instance(
-                        name=f"instance={len(instances)}",
+                        name=name,
                         n_jobs=n_jobs,
                         n_machines=n_machines,
                         jobs=jobs,

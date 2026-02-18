@@ -28,12 +28,13 @@ def job_based_crossover(parent1: List[int], parent2: List[int], n_jobs: int):
     return offspring
 
 
-def generate_random_genome(n_machines: int, n_jobs: int):
+def generate_random_genome(n_jobs: int, n_machines: int):
     res = []
-    for _ in range(n_jobs):
+    print(n_jobs, n_machines)
+    for _ in range(n_machines):
         res.extend(random.sample(range(n_jobs), n_jobs))
     for i in range(n_jobs):
-        assert res.count(i) == n_jobs, f"Expected {n_jobs} occurances of i, got {res.count(i)}"
+        assert res.count(i) == n_machines, f"Expected {n_machines} occurances of i, got {res.count(i)}"
     return tuple(res)
 
 
@@ -122,4 +123,4 @@ class Population():
                 gens_without_improvement = 0
             if gens_without_improvement == self.max_iterations_without_improvement:
                 break
-        return best_score
+        return self.population[0], best_score

@@ -10,6 +10,7 @@ def parse_all_abz(text) -> List[Schedule_Instance]:
     instances: List[Schedule_Instance] = []
 
     i = 0
+    name = ""
     while i < len(lines):
         name_match = re.match("instance +\\w", lines[i])
         if name_match: 
@@ -37,6 +38,9 @@ def parse_all_abz(text) -> List[Schedule_Instance]:
                 ops        = [(ints[k], ints[k+1]) for k in range(0, len(ints), 2)]
 
                 jobs.append(ops)
+
+
+
 
             if good:
                 instances.append(

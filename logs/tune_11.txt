@@ -1,0 +1,15 @@
+Log file: /home/calle/projects/ROA/logs/tune_11.txt
+
+BEST CONFIG FOUND
+cfg: {'lambda': 161, 'mu': 444, 'new_genomes_per_gen': 150, 'max_no_improve': 20}
+stats: {'mean': 810.4666666666667, 'median': 967, 'min': 55, 'max': 1282, 'runtime_sec': 19.529226571000436, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+population = Population(problem_instance=inst, lambda=161, mu=444, max_iterations_without_improvement=20, new_genomes_per_gen=150)
+
+BEST CONFIG FOUND
+cfg: {'iterations': 87, 'local_steps': 200, 'swaps': 2, 'accept_worse_prob': 0.15, 'init': 'order'}
+stats: {'mean': 819.6, 'median': 988, 'min': 55, 'max': 1300, 'runtime_sec': 4.094601667999996, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+params = ILSParams(iterations=87, local_steps=200, swaps=2, seed=123, accept_worse_prob=0.15, verbose_every=0, init='order')

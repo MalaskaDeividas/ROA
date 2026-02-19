@@ -1,0 +1,7 @@
+Log file: /home/calle/projects/ROA/logs/tune_7.txt
+
+BEST CONFIG FOUND
+cfg: {'lambda': 161, 'mu': 444, 'new_genomes_per_gen': 150, 'max_no_improve': 20}
+stats: {'mean': 809.6, 'median': 948, 'min': 55, 'max': 1281, 'runtime_sec': 20.254525582000042, 'n_runs': 15}
+
+COPY/PASTE USAGE:

@@ -1,6 +1,8 @@
 from parser.abz_parser import parse_all_abz, print_all
 from trajectory.ils import ILSParams, iterated_local_search, get_makespan
 from population.gs import Population
+from plotter.plot import plot_all_instances
+from compare import compare_on_instance
 import random
 import json
 
@@ -10,7 +12,7 @@ def run_specific_ils():
         jobshop = f.read()
 
     instances = parse_all_abz(jobshop)
-    inst = instances[5]
+    inst = instances[79]
     rand = 42 + random.randint(0, 1_000_000_000)
 
     params = ILSParams(iterations=10, local_steps=10, swaps=7, seed=rand, accept_worse_prob=0.1, verbose_every=200, init="order")
@@ -47,5 +49,10 @@ def main():
     
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     run_specific_ils()
     run_gs()
+=======
+    main()
+
+>>>>>>> deivi_dev

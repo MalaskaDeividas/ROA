@@ -50,6 +50,8 @@ def get_makespan(instance: ThisType, seq: list[int]):
     #print(f"job ready; {job_ready}, max job ready; {max(job_ready)}")
     return max(machine_ready)
 
+
+
 # how many operations job do
 def job_op_counts(instance: ThisType):
     return [len(instance.jobs[n]) for n in range(instance.n_jobs)]
@@ -79,7 +81,7 @@ def initial_state(instance: ThisType, rng: random.Random, method="order"):
                 seq.append(i)
                 rem[i] -= 1
 
-    print(f"Sequence from initial_state: {seq}")
+    #print(f"Sequence from initial_state: {seq}")
     return seq
 
 # swao two neighbors

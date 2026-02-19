@@ -1,0 +1,8 @@
+Log file: /home/calle/projects/ROA/logs/tune_9.txt
+
+BEST CONFIG FOUND
+cfg: {'lambda': 162, 'mu': 855, 'new_genomes_per_gen': 150, 'max_no_improve': 15}
+stats: {'mean': 810.0666666666667, 'median': 958, 'min': 55, 'max': 1294, 'runtime_sec': 16.710854588000075, 'n_runs': 15}
+
+COPY/PASTE USAGE:
+population = Population(problem_instance=inst, lambda=162, mu=855, max_iterations_without_improvement=15, new_genomes_per_gen=150)
